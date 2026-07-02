@@ -1,6 +1,7 @@
 import React from 'react'
 import Approute from './Routes/Approute'
-import UpdateStudent from './Pages/UpdateStudent'
+import Login from './Pages/Login'
+
 
 
 
@@ -12,7 +13,8 @@ export default function App() {
 
 
   <Approute/>
-  <UpdateStudent/>
+  <Login/>
+  
   
 
 

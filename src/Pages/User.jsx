@@ -1,124 +1,223 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Search,
   Plus,
   Eye,
   Pencil,
   Trash2,
+  Users,
 } from "lucide-react";
 
+import {
+  getAllUsers,
+  deleteUser,
+  searchUser,
+} from "../services/user-service";
+
+import { Link, useNavigate } from "react-router-dom";
+
 export default function User() {
-  const users = [
-    {
-      id: 1,
-      username: "admin",
-      email: "admin@gmail.com",
-      role: "Admin",
-      createdAt: "2026-06-25",
-    },
-    {
-      id: 2,
-      username: "hiba",
-      email: "hiba@gmail.com",
-      role: "Student",
-      createdAt: "2026-06-25",
-    },
-    {
-      id: 3,
-      username: "ahmed",
-      email: "ahmed@gmail.com",
-      role: "Teacher",
-      createdAt: "2026-06-25",
-    },
-  ];
+  const navigate = useNavigate();
+
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // =========================
+  // LOAD USERS
+  // =========================
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+
+      const res = await getAllUsers();
+
+      setUsers(res?.data || []);
+    } catch (err) {
+      console.log(err.message);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  // =========================
+  // SEARCH USER
+  // =========================
+  const handleSearch = async (value) => {
+    setSearch(value);
+
+    if (value.trim() === "") {
+      loadUsers();
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const res = await searchUser(value);
+
+      setUsers(res?.data || []);
+    } catch (err) {
+      console.log(err.message);
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =========================
+  // DELETE USER
+  // =========================
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    try {
+      await deleteUser(id);
+      loadUsers();
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Users Management
-        </h1>
+    <div className="p-6 bg-gray-100 min-h-screen">
 
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+
+        <div className="flex items-center gap-3">
+          <Users className="text-blue-600" size={30} />
+
+          <div>
+            <h1 className="text-3xl font-bold">Users</h1>
+            <p className="text-gray-500">
+              Total Users: {users.length}
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to="/dashboard/CreateUser"
+          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
+        >
           <Plus size={18} />
           Add User
-        </button>
+        </Link>
+
       </div>
 
-      {/* Search */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-3 top-3.5 text-gray-400"
-          />
+      {/* SEARCH */}
+      <div className="relative mb-6 w-full md:w-96">
 
-          <input
-            type="text"
-            placeholder="Search user..."
-            className="w-full border rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
+        <Search
+          className="absolute left-3 top-3 text-gray-400"
+          size={18}
+        />
+
+        <input
+          type="text"
+          placeholder="Search user..."
+          value={search}
+          onChange={(e) => handleSearch(e.target.value)}
+          className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      {/* TABLE */}
+      <div className="bg-white rounded-xl shadow overflow-hidden">
+
         <table className="w-full">
-          <thead className="bg-slate-800 text-white">
+
+          <thead className="bg-blue-600 text-white">
             <tr>
-              <th className="px-4 py-3 text-left">Id</th>
-              <th className="px-4 py-3 text-left">Username</th>
-              <th className="px-4 py-3 text-left">Email</th>
-              <th className="px-4 py-3 text-left">Role</th>
-              <th className="px-4 py-3 text-left">Created At</th>
-              <th className="px-4 py-3 text-center">Actions</th>
+              <th className="p-3">ID</th>
+              <th className="p-3">Username</th>
+              <th className="p-3">Email</th>
+              <th className="p-3">Role</th>
+              <th className="p-3 text-center">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b hover:bg-gray-50"
-              >
-                <td className="px-4 py-3">{user.id}</td>
 
-                <td className="px-4 py-3 font-medium">
-                  {user.username}
-                </td>
-
-                <td className="px-4 py-3">{user.email}</td>
-
-                <td className="px-4 py-3">
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    {user.role}
-                  </span>
-                </td>
-
-                <td className="px-4 py-3">
-                  {user.createdAt}
-                </td>
-
-                <td className="px-4 py-3">
-                  <div className="flex justify-center gap-2">
-                    <button className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg">
-                      <Eye size={16} />
-                    </button>
-
-                    <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg">
-                      <Pencil size={16} />
-                    </button>
-
-                    <button className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+            {loading ? (
+              <tr>
+                <td colSpan="5" className="text-center p-6">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : users.length > 0 ? (
+              users.map((u) => (
+                <tr
+                  key={u.id ?? u.Id}
+                  className="border-b hover:bg-gray-50"
+                >
+
+                  <td className="p-3">
+                    {u.id ?? u.Id}
+                  </td>
+
+                  <td className="p-3 font-medium">
+                    {u.username ?? u.Username}
+                  </td>
+
+                  <td className="p-3">
+                    {u.email ?? u.Email}
+                  </td>
+
+                  <td className="p-3">
+                    {u.role ?? u.Role}
+                  </td>
+
+                  <td className="p-3">
+                    <div className="flex justify-center gap-2">
+
+                      <button className="p-2 text-green-600 hover:bg-green-100 rounded-lg">
+                        <Eye size={18} />
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          navigate(`/dashboard/updateUser/${u.id ?? u.Id}`)
+                        }
+                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
+                      >
+                        <Pencil size={18} />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(u.id ?? u.Id)}
+                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+
+                    </div>
+                  </td>
+
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="text-center p-6 text-gray-500"
+                >
+                  No users found
+                </td>
+              </tr>
+            )}
+
           </tbody>
+
         </table>
+
       </div>
     </div>
   );
