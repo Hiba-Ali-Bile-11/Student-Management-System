@@ -1,25 +1,37 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-console.log("API:", API_URL);
-
 // =========================
 // SAFE RESPONSE HANDLER
 // =========================
-async function handleResponse(response) {
-  let data;
+// async function handleResponse(response) {
+//     const data = await response.json();
 
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
+//     if (!response.ok) {
+//         throw new Error(data?.message || "Something went wrong");
+//     }
+
+//     return data;
+// }
+
+async function handleResponse(response) {
+  const data = await response.json();
+
+  console.log("Response Status:", response.status);
+  console.log("Response Data:", data);
 
   if (!response.ok) {
-    throw new Error(data?.message || "Request failed");
+    throw new Error(
+      data.message ||
+      data.title ||
+      JSON.stringify(data) ||
+      "Something went wrong"
+    );
   }
 
   return data;
 }
+
+
 
 // =========================
 // GET ALL STUDENTS

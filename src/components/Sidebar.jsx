@@ -39,11 +39,11 @@ function Sidebar() {
           Students
         </NavLink>
 
-        <NavLink to="/departments" className={linkClass}>
-          Departments
-        </NavLink>
+        <NavLink to="/dashboard/department" className={linkClass}>
+  Departments
+</NavLink>
 
-        <NavLink to="/courses" className={linkClass}>
+        <NavLink to="/dashboard/Course" className={linkClass}>
           Courses
         </NavLink>
 

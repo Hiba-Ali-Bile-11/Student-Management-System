@@ -6,19 +6,13 @@ console.log("API:", API_URL);
 // SAFE RESPONSE HANDLER
 // =========================
 async function handleResponse(response) {
-  let data;
+    const data = await response.json();
 
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
+    if (!response.ok) {
+        throw new Error(data?.message || "Something went wrong");
+    }
 
-  if (!response.ok) {
-    throw new Error(data?.message || "Request failed");
-  }
-
-  return data;
+    return data;
 }
 
 // =========================
