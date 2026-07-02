@@ -29,66 +29,20 @@ export default function Course() {
   const [creditHours, setCreditHours] = useState("");
   const [departmentId, setDepartmentId] = useState("");
 
-  const [errors, setErrors] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 5;
 
-  // ================= VALIDATION =================
-  const isOnlyLetters = (text) => /^[a-zA-Z\s]+$/.test(text);
-  const isOnlyNumbers = (text) => /^[0-9]+$/.test(text);
-
-  const handleCourseName = (value) => {
-    setCourseName(value);
-
-    if (!isOnlyLetters(value)) {
-      setErrors((prev) => ({
-        ...prev,
-        courseName: "Course name must contain only letters",
-      }));
-    } else {
-      setErrors((prev) => {
-        const e = { ...prev };
-        delete e.courseName;
-        return e;
-      });
-    }
-  };
-
-  const handleCreditHours = (value) => {
-    setCreditHours(value);
-
-    if (!isOnlyNumbers(value)) {
-      setErrors((prev) => ({
-        ...prev,
-        creditHours: "Credit hours must be numbers only",
-      }));
-    } else {
-      setErrors((prev) => {
-        const e = { ...prev };
-        delete e.creditHours;
-        return e;
-      });
-    }
-  };
-
-  // ================= LOAD =================
+  // LOAD
   const loadCourses = async () => {
-    try {
-      setLoading(true);
-      const res = await getCourses();
-      setCourses(res?.data || res || []);
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    } finally {
-      setLoading(false);
-    }
+    setLoading(true);
+    const res = await getCourses();
+    setCourses(res?.data || res || []);
+    setLoading(false);
   };
 
   const loadDepartments = async () => {
-    try {
-      const res = await getDepartments();
-      setDepartments(res?.data || res || []);
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    }
+    const res = await getDepartments();
+    setDepartments(res?.data || res || []);
   };
 
   useEffect(() => {
@@ -96,25 +50,30 @@ export default function Course() {
     loadDepartments();
   }, []);
 
-  // ================= SEARCH =================
+  // SEARCH
   const filteredCourses = courses.filter((c) =>
-    String(c.courseName ?? c.CourseName ?? "")
+    `${c.courseName ?? c.CourseName}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  // ================= OPEN CREATE =================
+  // PAGINATION
+  const indexOfLast = currentPage * rowsPerPage;
+  const indexOfFirst = indexOfLast - rowsPerPage;
+  const currentCourses = filteredCourses.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(filteredCourses.length / rowsPerPage);
+
+  // OPEN CREATE
   const openCreate = () => {
     setCourseName("");
     setCreditHours("");
     setDepartmentId("");
-    setEditId(null);
     setIsEdit(false);
-    setErrors({});
+    setEditId(null);
     setShowModal(true);
   };
 
-  // ================= OPEN EDIT =================
+  // OPEN EDIT
   const openEdit = (c) => {
     setCourseName(c.courseName ?? c.CourseName);
     setCreditHours(c.creditHours ?? c.CreditHours);
@@ -122,79 +81,68 @@ export default function Course() {
 
     setEditId(c.id ?? c.Id);
     setIsEdit(true);
-    setErrors({});
     setShowModal(true);
   };
 
-  // ================= SUBMIT =================
+  // SUBMIT
   const handleSubmit = async () => {
-    if (Object.keys(errors).length > 0) return;
-
     if (!courseName || !creditHours || !departmentId) {
       Swal.fire("Error", "All fields are required", "error");
       return;
     }
 
-    try {
-      setSaving(true);
+    const payload = {
+      courseName,
+      creditHours: Number(creditHours),
+      departmentId: Number(departmentId),
+    };
 
-      const payload = {
-        courseName,
-        creditHours: Number(creditHours),
-        departmentId: Number(departmentId),
-      };
+    setSaving(true);
 
-      if (isEdit) {
-        await updateCourse(editId, payload);
-        Swal.fire("Success", "Course Updated", "success");
-      } else {
-        await createCourse(payload);
-        Swal.fire("Success", "Course Created", "success");
-      }
-
-      setShowModal(false);
-      setIsEdit(false);
-      setEditId(null);
-
-      loadCourses();
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    } finally {
-      setSaving(false);
+    if (isEdit) {
+      await updateCourse(editId, payload);
+      Swal.fire("Success", "Course Updated", "success");
+    } else {
+      await createCourse(payload);
+      Swal.fire("Success", "Course Created", "success");
     }
+
+    setShowModal(false);
+    loadCourses();
+    setSaving(false);
   };
 
-  // ================= DELETE =================
+  // DELETE
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
+    const res = await Swal.fire({
       title: "Delete Course?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
     });
 
-    if (!result.isConfirmed) return;
+    if (!res.isConfirmed) return;
 
-    try {
-      await deleteCourse(id);
-      Swal.fire("Deleted", "Course removed", "success");
-      loadCourses();
-    } catch (err) {
-      Swal.fire("Error", err.message, "error");
-    }
+    await deleteCourse(id);
+    loadCourses();
   };
 
-  // ================= UI =================
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="min-h-screen bg-blue-50 p-8">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
-          <BookOpen className="text-blue-600" />
+      {/* HEADER (SAME AS STUDENT) */}
+      <div className="flex justify-between items-center mb-8">
+
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
+            <BookOpen className="text-white" size={28} />
+          </div>
+
           <div>
-            <h1 className="text-2xl font-bold">Courses</h1>
-            <p className="text-gray-500">
+            <h1 className="text-3xl font-bold text-[#1E3A8A]">
+              Courses
+            </h1>
+            <p className="text-[#2563EB]">
               Total: {filteredCourses.length}
             </p>
           </div>
@@ -202,73 +150,82 @@ export default function Course() {
 
         <button
           onClick={openCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all"
         >
           <Plus size={18} /> Add Course
         </button>
       </div>
 
-      {/* SEARCH */}
-      <div className="mb-5 w-80 relative">
-        <Search className="absolute left-3 top-2.5 text-gray-400" />
+      {/* SEARCH (SAME STYLE) */}
+      <div className="mb-6 w-96 relative">
+        <Search className="absolute left-4 top-3 text-[#2563EB]" />
+
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search course..."
-          className="w-full pl-10 border rounded-lg py-2"
+          className="w-full pl-11 py-3 rounded-xl border border-blue-200 bg-white focus:ring-4 focus:ring-cyan-300 outline-none shadow-sm"
         />
       </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-x-auto">
-        <table className="w-full min-w-[700px]">
-          <thead className="bg-blue-600 text-white">
+      {/* TABLE (SAME STYLE FEEL) */}
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <table className="w-full min-w-[900px]">
+
+          <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
             <tr>
-              <th className="p-3">ID</th>
-              <th className="p-3">Course</th>
-              <th className="p-3">Credit Hours</th>
-              <th className="p-3">Department</th>
-              <th className="p-3">Actions</th>
+              <th className="p-4">ID</th>
+              <th className="p-4">Course</th>
+              <th className="p-4">Credit Hours</th>
+              <th className="p-4">Department</th>
+              <th className="p-4">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="5" className="text-center p-5">
+                <td colSpan="5" className="text-center p-6 text-gray-500">
                   Loading...
                 </td>
               </tr>
-            ) : filteredCourses.length > 0 ? (
-              filteredCourses.map((c) => {
+            ) : currentCourses.length > 0 ? (
+              currentCourses.map((c) => {
                 const dept = departments.find(
                   (d) => (d.id ?? d.Id) === (c.departmentId ?? c.DepartmentId)
                 );
 
                 return (
-                  <tr key={c.id ?? c.Id} className="border-b">
-                    <td className="p-3">{c.id ?? c.Id}</td>
-                    <td className="p-3">{c.courseName ?? c.CourseName}</td>
-                    <td className="p-3">{c.creditHours ?? c.CreditHours}</td>
-                    <td className="p-3">
-                      {dept?.name ?? dept?.Name ?? "Unknown"}
-                    </td>
+                  <tr key={c.id ?? c.Id} className="border-b hover:bg-blue-50">
 
-                    <td className="p-3 flex gap-2">
-                      <button onClick={() => openEdit(c)} className="text-blue-600 p-2">
+                    <td className="p-4">{c.id ?? c.Id}</td>
+                    <td className="p-4">{c.courseName ?? c.CourseName}</td>
+                    <td className="p-4">{c.creditHours ?? c.CreditHours}</td>
+                    <td className="p-4">{dept?.name ?? dept?.Name}</td>
+
+                    <td className="p-4 flex gap-2">
+
+                      <button
+                        onClick={() => openEdit(c)}
+                        className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center"
+                      >
                         <Pencil size={18} />
                       </button>
 
-                      <button onClick={() => handleDelete(c.id ?? c.Id)} className="text-red-600 p-2">
+                      <button
+                        onClick={() => handleDelete(c.id ?? c.Id)}
+                        className="w-10 h-10 rounded-lg bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center"
+                      >
                         <Trash2 size={18} />
                       </button>
+
                     </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan="5" className="text-center p-5">
+                <td colSpan="5" className="text-center p-6 text-gray-500">
                   No Courses Found
                 </td>
               </tr>
@@ -277,49 +234,72 @@ export default function Course() {
         </table>
       </div>
 
-      {/* MODAL */}
+      {/* PAGINATION (SAME STYLE AS STUDENT) */}
+      <div className="flex justify-center items-center gap-3 mt-6">
+
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === i + 1
+                ? "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
+                : "border border-blue-200 text-[#1E3A8A]"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
+        >
+          Next
+        </button>
+
+      </div>
+
+      {/* MODAL (SAME STYLE SYSTEM) */}
       <AnimatePresence>
         {showModal && (
           <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-            <motion.div className="bg-white p-6 rounded-xl w-[400px]">
 
-              <h2 className="text-xl font-bold mb-4">
+            <motion.div className="bg-white rounded-3xl p-8 w-[500px]">
+
+              <h2 className="text-2xl font-bold text-[#1E3A8A] mb-6">
                 {isEdit ? "Update Course" : "Add Course"}
               </h2>
 
-              {/* COURSE NAME */}
               <input
-                className="w-full border p-2 rounded"
+                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
                 placeholder="Course Name"
                 value={courseName}
-                onChange={(e) => handleCourseName(e.target.value)}
+                onChange={(e) => setCourseName(e.target.value)}
               />
-              {errors.courseName && (
-                <p className="text-red-600 text-sm mb-2">
-                  {errors.courseName}
-                </p>
-              )}
 
-              {/* CREDIT HOURS */}
               <input
-                className="w-full border p-2 rounded mt-3"
+                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
                 placeholder="Credit Hours"
                 value={creditHours}
-                onChange={(e) => handleCreditHours(e.target.value)}
+                onChange={(e) => setCreditHours(e.target.value)}
               />
-              {errors.creditHours && (
-                <p className="text-red-600 text-sm mb-2">
-                  {errors.creditHours}
-                </p>
-              )}
 
-              {/* DEPARTMENT */}
               <select
-                className="w-full border p-2 rounded mt-3"
+                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
                 value={departmentId}
                 onChange={(e) => setDepartmentId(e.target.value)}
               >
-                <option value="">Select Department</option>
+                <option>Select Department</option>
                 {departments.map((d) => (
                   <option key={d.id ?? d.Id} value={d.id ?? d.Id}>
                     {d.name ?? d.Name}
@@ -327,25 +307,29 @@ export default function Course() {
                 ))}
               </select>
 
-              {/* BUTTONS */}
-              <div className="flex justify-end gap-2 mt-4">
-                <button onClick={() => setShowModal(false)} className="border px-3 py-2 rounded">
+              <div className="flex justify-end gap-3 mt-6">
+
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-5 py-3 rounded-xl border"
+                >
                   Cancel
                 </button>
 
                 <button
                   onClick={handleSubmit}
-                  disabled={saving}
-                  className="bg-blue-600 text-white px-3 py-2 rounded"
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
                 >
                   {saving ? "Saving..." : isEdit ? "Update" : "Save"}
                 </button>
+
               </div>
 
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }

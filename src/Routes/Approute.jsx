@@ -10,6 +10,8 @@ import Student from "../Pages/Student";
 // import { updateStudent } from "../services/student-service";
 import Department from "../Pages/Department";
 import Course from "../Pages/Course";
+import Logout from "../Pages/Logout";
+import Login from '../Pages/Login'
 
 function Approute() {
   return (
@@ -18,7 +20,11 @@ function Approute() {
     
     
     <Routes>
+
+      
+    <Route path="/login" element={<Login />}/>
     <Route path="/dashboard" element={<Dashboard />}>
+
     <Route index element={< DashStatus/>} />
     <Route path="users" element={<User />} />
     <Route path="students" element={<Student/>} />
@@ -26,6 +32,7 @@ function Approute() {
     {/* <Route path="updateStudent" element={ <updateStudent/>} /> */}
     <Route path="department" element={<Department/>}/>
     <Route path="Course" element={<Course/>} />
+    <Route path="Logout" element={<Logout/>} />
     
 
 
