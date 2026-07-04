@@ -216,9 +216,10 @@ export default function Student() {
                   </td>
 
                   <td>{s.gender || s.Gender}</td>
-                  <td>{s.Address || s.address}</td>
+                 
 
                   <td>{s.age || s.Age}</td>
+                   <td>{s.Address || s.address}</td>
 
                   <td>{s.phone || s.Phone}</td>
                   <td>{s.ParentPhone || s.parentPhone}</td>
