@@ -1,46 +1,56 @@
+import {Routes, Route } from "react-router-dom";
 
+import Home from "../pages/Home";
+import About from "../pages/About";
+import Contact from "../pages/Contact";
+import Services from "../pages/Services";
+import Members from "../Pages/Members";
+import Login from "../pages/Login";
 
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Dashboard from "../Pages/Dashbord";
-import DashStatus from "../Pages/DashStatus";
-import User from "../Pages/User";
-import Student from "../Pages/Student";
-// import CreateStudent from "../Pages/CreateStudent";
-// import { updateStudent } from "../services/student-service";
-import Department from "../Pages/Department";
-import Course from "../Pages/Course";
+import Dashbord from "../pages/Dashbord";
+import DashStatus from "../pages/DashStatus";
+import Student from "../pages/Student";
+import Department from "../pages/Department";
+import Course from "../pages/Course";
+
+import ProtectedRoute from "../components/ProtectedRoute";
+import User from "../pages/User";
 import Logout from "../Pages/Logout";
-import Login from '../Pages/Login'
 
-function Approute() {
+function AppRoute() {
   return (
     
-   
+      <Routes>
+
+        {/* Public Pages */}
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/members" element={<Members/>} />
+        
+        <Route path="/login" element={<Login />} />
+        <Route path="/Logout" element={<Logout />} />
+
+        {/* Dashbord */}
+        <Route
+          path="/dashbord"
+          element={
+            <ProtectedRoute>
+              <Dashbord />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DashStatus />} />
+          <Route path="students" element={<Student />} />
+          <Route path="department" element={<Department />} />
+          <Route path="course" element={<Course />} />
+          <Route path="users" element={<User />} />
+        </Route>
+
+      </Routes>
     
-    
-    <Routes>
-
-      
-    <Route path="/login" element={<Login />}/>
-    <Route path="/dashboard" element={<Dashboard />}>
-
-    <Route index element={< DashStatus/>} />
-    <Route path="users" element={<User />} />
-    <Route path="students" element={<Student/>} />
-    {/* <Route path="CreateStudent" element={ <CreateStudent/>} /> */}
-    {/* <Route path="updateStudent" element={ <updateStudent/>} /> */}
-    <Route path="department" element={<Department/>}/>
-    <Route path="Course" element={<Course/>} />
-    <Route path="Logout" element={<Logout/>} />
-    
-
-
-
-    </Route>
-   </Routes>
   );
-
 }
 
-export default Approute;
+export default AppRoute;

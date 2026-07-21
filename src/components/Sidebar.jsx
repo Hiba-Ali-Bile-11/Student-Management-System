@@ -2,7 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 
 import {
-  LayoutDashboard,Users,GraduationCap,Building2,BookOpen,ClipboardList,KeyRound,LogOut,
+  LayoutDashboard, Users, GraduationCap, Building2, BookOpen, ClipboardList, KeyRound, LogOut,
 } from "lucide-react";
 
 function Sidebar() {
@@ -23,46 +23,32 @@ function Sidebar() {
 
       {/* Menu */}
       <nav className="p-4 space-y-2">
-        <NavLink to="/dashboard" end className={linkClass}> <LayoutDashboard size={20} />
-  Dashboard
-</NavLink>
-
-<NavLink to="/dashboard/users" className={linkClass}> <Users size={20} />
-  Users
-</NavLink>
-
-        {/* <NavLink to="/DashStatus" end className={linkClass}>
+        <NavLink to="/dashbord" end className={linkClass}> <LayoutDashboard size={20} />
           Dashboard
         </NavLink>
 
-        <NavLink to="/users" className={linkClass}>
+        <NavLink to="/dashbord/users" className={linkClass}> <Users size={20} />
           Users
-        </NavLink> */}
+        </NavLink>
 
-        <NavLink to="/dashboard/students" className={linkClass}> <GraduationCap size={20} />
+
+
+        <NavLink to="/dashbord/students" className={linkClass}> <GraduationCap size={20} />
           Students
         </NavLink>
 
-        <NavLink to="/dashboard/department" className={linkClass}> <Building2 size={20} />
-  Departments
-</NavLink>
+        <NavLink to="/dashbord/department" className={linkClass}> <Building2 size={20} />
+          Departments
+        </NavLink>
 
-        <NavLink to="/dashboard/Course" className={linkClass}> <BookOpen size={20} />
+        <NavLink to="/dashbord/Course" className={linkClass}> <BookOpen size={20} />
           Courses
         </NavLink>
 
-        <NavLink to="/enrollments" className={linkClass}> <ClipboardList size={20} /> 
-          Enrollments
-        </NavLink>
-
-        <NavLink to="/change-password" className={linkClass}> <KeyRound size={20} /> 
-          Change Password
-        </NavLink>
-
         <NavLink
-          to="/dashboard/Logout"
+          to="/Logout"
           className="block px-4 py-3 rounded-lg text-red-400 hover:bg-slate-800"
-        > <LogOut size={20}  /> 
+        > <LogOut size={20} />
           Logout
         </NavLink>
 
