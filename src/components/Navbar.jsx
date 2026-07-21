@@ -104,6 +104,12 @@ function Navbar() {
 
 
           <li>
+            <NavLink to="/register" className={navLink}>
+              Register
+            </NavLink>
+          </li>
+
+          <li>
             <NavLink to="/login" className={navLink}>
               Login
             </NavLink>
@@ -215,6 +221,24 @@ function Navbar() {
                   Contact
                 </NavLink>
               </li>
+
+              <li>
+            <NavLink to="/members" className={navLink}>
+              Members
+            </NavLink>
+          </li>
+
+              <li>
+            <NavLink to="/register" className={navLink}>
+              Register
+            </NavLink>
+          </li>
+
+          <li>
+            <NavLink to="/login" className={navLink}>
+              Login
+            </NavLink>
+          </li>
 
 
               <button

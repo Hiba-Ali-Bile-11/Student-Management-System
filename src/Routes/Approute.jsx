@@ -16,6 +16,7 @@ import Course from "../pages/Course";
 import ProtectedRoute from "../components/ProtectedRoute";
 import User from "../pages/User";
 import Logout from "../Pages/Logout";
+import Register from "../Pages/Register";
 
 function AppRoute() {
   return (
@@ -28,6 +29,7 @@ function AppRoute() {
         <Route path="/services" element={<Services />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/members" element={<Members/>} />
+        <Route path="/register" element={<Register/>} />
         
         <Route path="/login" element={<Login />} />
         <Route path="/Logout" element={<Logout />} />
