@@ -23,21 +23,22 @@ export default function User() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // =========================
-  // LOAD USERS
-  // =========================
+  // ================= PAGINATION =================
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
+
+  // ================= LOAD USERS =================
   const loadUsers = async () => {
     try {
       setLoading(true);
-
       const res = await getAllUsers();
-
       setUsers(res?.data || []);
     } catch (err) {
       console.log(err.message);
       setUsers([]);
     } finally {
       setLoading(false);
+      setCurrentPage(1); // reset like course style
     }
   };
 
@@ -45,11 +46,10 @@ export default function User() {
     loadUsers();
   }, []);
 
-  // =========================
-  // SEARCH USER
-  // =========================
+  // ================= SEARCH =================
   const handleSearch = async (value) => {
     setSearch(value);
+    setCurrentPage(1);
 
     if (value.trim() === "") {
       loadUsers();
@@ -58,9 +58,7 @@ export default function User() {
 
     try {
       setLoading(true);
-
       const res = await searchUser(value);
-
       setUsers(res?.data || []);
     } catch (err) {
       console.log(err.message);
@@ -70,9 +68,7 @@ export default function User() {
     }
   };
 
-  // =========================
-  // DELETE USER
-  // =========================
+  // ================= DELETE =================
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
@@ -84,63 +80,73 @@ export default function User() {
     }
   };
 
+  // ================= PAGINATION LOGIC (COURSE STYLE) =================
+  const filteredUsers = users.filter((u) =>
+    `${u.username ?? u.Username}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
+
+  const indexOfLast = currentPage * rowsPerPage;
+  const indexOfFirst = indexOfLast - rowsPerPage;
+  const paginatedUsers = filteredUsers.slice(indexOfFirst, indexOfLast);
+
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className="min-h-screen bg-blue-50 p-8">
 
       {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-8">
 
-        <div className="flex items-center gap-3">
-          <Users className="text-blue-600" size={30} />
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
+            <Users className="text-white" size={28} />
+          </div>
 
           <div>
-            <h1 className="text-3xl font-bold">Users</h1>
-            <p className="text-gray-500">
-              Total Users: {users.length}
+            <h1 className="text-3xl font-bold text-[#1E3A8A]">
+              Users
+            </h1>
+            <p className="text-[#2563EB]">
+              Total: {filteredUsers.length}
             </p>
           </div>
         </div>
 
         <Link
           to="/dashboard/CreateUser"
-          className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all"
         >
-          <Plus size={18} />
-          Add User
+          <Plus size={18} /> Add User
         </Link>
 
       </div>
 
       {/* SEARCH */}
-      <div className="relative mb-6 w-full md:w-96">
-
-        <Search
-          className="absolute left-3 top-3 text-gray-400"
-          size={18}
-        />
+      <div className="mb-6 w-96 relative">
+        <Search className="absolute left-4 top-3 text-[#2563EB]" />
 
         <input
-          type="text"
-          placeholder="Search user..."
           value={search}
           onChange={(e) => handleSearch(e.target.value)}
-          className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Search user..."
+          className="w-full pl-11 py-3 rounded-xl border border-blue-200 bg-white focus:ring-4 focus:ring-cyan-300 outline-none shadow-sm"
         />
-
       </div>
 
       {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
 
-        <table className="w-full">
+        <table className="w-full min-w-[900px]">
 
-          <thead className="bg-blue-600 text-white">
+          <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
             <tr>
-              <th className="p-3">ID</th>
-              <th className="p-3">Username</th>
-              <th className="p-3">Email</th>
-              <th className="p-3">Role</th>
-              <th className="p-3 text-center">Actions</th>
+              <th className="p-4">ID</th>
+              <th className="p-4">Username</th>
+              <th className="p-4">Email</th>
+              <th className="p-4">Role</th>
+              <th className="p-4">Actions</th>
             </tr>
           </thead>
 
@@ -152,64 +158,45 @@ export default function User() {
                   Loading...
                 </td>
               </tr>
-            ) : users.length > 0 ? (
-              users.map((u) => (
-                <tr
-                  key={u.id ?? u.Id}
-                  className="border-b hover:bg-gray-50"
-                >
+            ) : paginatedUsers.length > 0 ? (
+              paginatedUsers.map((u) => (
+                <tr key={u.id ?? u.Id} className="border-b hover:bg-blue-50">
 
-                  <td className="p-3">
-                    {u.id ?? u.Id}
-                  </td>
+                  <td className="p-4">{u.id ?? u.Id}</td>
+                  <td className="p-4">{u.username ?? u.Username}</td>
+                  <td className="p-4">{u.email ?? u.Email}</td>
+                  <td className="p-4">{u.role ?? u.Role}</td>
 
-                  <td className="p-3 font-medium">
-                    {u.username ?? u.Username}
-                  </td>
+                  <td className="p-4 flex gap-2">
 
-                  <td className="p-3">
-                    {u.email ?? u.Email}
-                  </td>
+                    <button className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center">
+                      <Eye size={18} />
+                    </button>
 
-                  <td className="p-3">
-                    {u.role ?? u.Role}
-                  </td>
+                    <button
+                      onClick={() =>
+                        navigate(`/dashboard/updateUser/${u.id ?? u.Id}`)
+                      }
+                      className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center"
+                    >
+                      <Pencil size={18} />
+                    </button>
 
-                  <td className="p-3">
-                    <div className="flex justify-center gap-2">
+                    <button
+                      onClick={() => handleDelete(u.id ?? u.Id)}
+                      className="w-10 h-10 rounded-lg bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center"
+                    >
+                      <Trash2 size={18} />
+                    </button>
 
-                      <button className="p-2 text-green-600 hover:bg-green-100 rounded-lg">
-                        <Eye size={18} />
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          navigate(`/dashboard/updateUser/${u.id ?? u.Id}`)
-                        }
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(u.id ?? u.Id)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-
-                    </div>
                   </td>
 
                 </tr>
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="5"
-                  className="text-center p-6 text-gray-500"
-                >
-                  No users found
+                <td colSpan="5" className="text-center p-6 text-gray-500">
+                  No Users Found
                 </td>
               </tr>
             )}
@@ -217,8 +204,43 @@ export default function User() {
           </tbody>
 
         </table>
+      </div>
+
+      {/* PAGINATION (COURSE STYLE) */}
+      <div className="flex justify-center items-center gap-3 mt-6">
+
+        <button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
+        >
+          Previous
+        </button>
+
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`px-4 py-2 rounded-lg ${
+              currentPage === i + 1
+                ? "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
+                : "border border-blue-200 text-[#1E3A8A]"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+
+        <button
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
+        >
+          Next
+        </button>
 
       </div>
+
     </div>
   );
 }

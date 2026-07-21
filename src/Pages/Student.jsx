@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Search, Plus, Pencil, Trash2, Users } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Swal from "sweetalert2";
 
 import {
-  getAllStudents,
-  createStudent,
-  updateStudent,
-  deleteStudent,
-} from "../services/student-service";
+  getAllStudents,createStudent,updateStudent,deleteStudent,} from "../services/student-service";
 
 import { getDepartments } from "../services/department-service";
 import { getCourses } from "../services/course-service";
@@ -20,109 +16,168 @@ export default function Student() {
 
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   const [editId, setEditId] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
 
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    gender: "",
-    age: "",
-    address: "",
-    phone: "",
-    parentPhone: "",
-    departmentId: "",
-    courseId: "",
-  });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [age, setAge] = useState("");
+  const [phone, setPhone] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
+  const [gender, setGender] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [courseId, setCourseId] = useState("");
 
-  // ================= NORMALIZE =================
-  const normalize = (res) => {
-    if (Array.isArray(res)) return res;
-    if (Array.isArray(res?.data)) return res.data;
-    return [];
-  };
+  const [errors, setErrors] = useState({});
+
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+
 
   // ================= LOAD =================
+  const loadStudents = async () => {
+    try {
+      setLoading(true);
+      const res = await getAllStudents();
+      setStudents(res?.data || res || []);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadDepartments = async () => {
+    try {
+      const res = await getDepartments();
+      setDepartments(res?.data || res || []);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
+  };
+
+  const loadCourses = async () => {
+    try {
+      const res = await getCourses();
+      setCourses(res?.data || res || []);
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
+  };
+
   useEffect(() => {
-    loadStudents();
-    loadDepartments();
-    loadCourses();
-  }, []);
+  loadStudents();
+  loadDepartments();
+  loadCourses();
+}, []);
 
-  async function loadStudents() {
-    setLoading(true);
-    const res = await getAllStudents();
-    setStudents(normalize(res));
-    setLoading(false);
+// ================= SEARCH =================
+const filteredStudents = students.filter((s) =>
+  `${s.firstName ?? s.FirstName ?? ""} ${s.lastName ?? s.LastName ?? ""}`
+    .toLowerCase()
+    .includes(search.toLowerCase())
+);
+
+// ================= RESET PAGE ON SEARCH =================
+useEffect(() => {
+  setCurrentPage(1);
+}, [search]);
+
+// ================= PAGINATION =================
+const indexOfLast = currentPage * rowsPerPage;
+const indexOfFirst = indexOfLast - rowsPerPage;
+
+const currentStudents = filteredStudents.slice(indexOfFirst, indexOfLast);
+
+const totalPages = Math.ceil(filteredStudents.length / rowsPerPage);
+
+// ================= SAFE PAGE FIX =================
+useEffect(() => {
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages || 1);
   }
-
-  async function loadDepartments() {
-    const res = await getDepartments();
-    setDepartments(normalize(res));
-  }
-
-  async function loadCourses() {
-    const res = await getCourses();
-    setCourses(normalize(res));
-  }
-
-  // ================= SEARCH =================
-  const filtered = students.filter((s) =>
-    `${s.firstName || s.FirstName} ${s.lastName || s.LastName}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+}, [filteredStudents]);
 
   // ================= OPEN CREATE =================
   const openCreate = () => {
-    setForm({
-      firstName: "",
-      lastName: "",
-      gender: "",
-      age: "",
-      address: "",
-      phone: "",
-      parentPhone: "",
-      departmentId: "",
-      courseId: "",
-    });
+    setFirstName("");
+    setLastName("");
+    setAddress("");
+    setAge("");
+    setPhone("");
+    setParentPhone("");
+    setGender("");
+    setDepartmentId("");
+    setCourseId("");
+
+    setEditId(null);
     setIsEdit(false);
     setShowModal(true);
+    setErrors({});
   };
 
   // ================= OPEN EDIT =================
   const openEdit = (s) => {
-    setForm({
-      firstName: s.firstName || s.FirstName,
-      lastName: s.lastName || s.LastName,
-      gender: s.gender || s.Gender,
-      age: s.age || s.Age,
-      address: s.address || s.Address,
-      phone: s.phone || s.Phone,
-      parentPhone: s.parentPhone || s.ParentPhone,
-      departmentId: s.departmentId || s.DepartmentId,
-      courseId: s.courseId || s.CourseId,
-    });
+    setFirstName(s.firstName ?? s.FirstName);
+    setLastName(s.lastName ?? s.LastName);
+    setAddress(s.address ?? s.Address);
+    setAge(s.age ?? s.Age);
+    setPhone(s.phone ?? s.Phone);
+    setParentPhone(s.parentPhone ?? s.ParentPhone);
+    setGender(s.gender ?? s.Gender);
+    setDepartmentId(s.departmentId ?? s.DepartmentId);
+    setCourseId(s.courseId ?? s.CourseId);
 
-    setEditId(s.id || s.Id);
+    setEditId(s.id ?? s.Id);
     setIsEdit(true);
     setShowModal(true);
   };
 
   // ================= SUBMIT =================
   const handleSubmit = async () => {
+    if (
+      !firstName ||
+      !lastName ||
+      !address ||
+      !age ||
+      !phone ||
+      !parentPhone ||
+      !gender ||
+      !departmentId ||
+      !courseId
+    ) {
+      Swal.fire("Error", "All fields are required", "error");
+      return;
+    }
+
     try {
       setSaving(true);
 
+      const payload = {
+        firstName,
+        lastName,
+        address,
+        age: Number(age),
+        phone,
+        parentPhone,
+        gender,
+        departmentId: Number(departmentId),
+        courseId: Number(courseId),
+      };
+
       if (isEdit) {
-        await updateStudent(editId, form);
-        Swal.fire("Updated!", "Student updated successfully", "success");
+        await updateStudent(editId, payload);
+        Swal.fire("Success", "Student Updated", "success");
       } else {
-        await createStudent(form);
-        Swal.fire("Created!", "Student added successfully", "success");
+        await createStudent(payload);
+        Swal.fire("Success", "Student Created", "success");
       }
 
       setShowModal(false);
@@ -136,267 +191,330 @@ export default function Student() {
 
   // ================= DELETE =================
   const handleDelete = async (id) => {
-    const res = await Swal.fire({
+    const result = await Swal.fire({
       title: "Delete Student?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
     });
 
-    if (!res.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-    await deleteStudent(id);
-    Swal.fire("Deleted!", "Student removed", "success");
-    loadStudents();
+    try {
+      await deleteStudent(id);
+      Swal.fire("Deleted", "Student removed", "success");
+      loadStudents();
+    } catch (err) {
+      Swal.fire("Error", err.message, "error");
+    }
   };
 
-  return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+ return (
+  <div className="min-h-screen bg-blue-50 p-8">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-5">
-        <div className="flex items-center gap-2">
-          <Users className="text-blue-600" />
-          <h1 className="text-2xl font-bold">Students</h1>
+    {/* HEADER */}
+    <div className="flex justify-between items-center mb-8">
+
+      <div className="flex items-center gap-4">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
+          <User className="text-white" size={28} />
         </div>
 
-        <button
-          onClick={openCreate}
-          className="bg-blue-600 text-white px-4 py-2 rounded flex gap-2"
-        >
-          <Plus size={18} /> Add Student
-        </button>
+        <div>
+          <h1 className="text-3xl font-bold text-[#1E3A8A]">
+            Students
+          </h1>
+          <p className="text-[#2563EB]">
+            Total: {filteredStudents.length}
+          </p>
+        </div>
       </div>
 
-      {/* SEARCH */}
-      <div className="mb-4 w-80 relative">
-        <Search className="absolute left-3 top-2.5 text-gray-400" />
-        <input
-          className="w-full pl-10 border p-2 rounded"
-          placeholder="Search student..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+      <button
+        onClick={openCreate}
+        className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white flex items-center gap-2 shadow-lg hover:scale-105 transition-all duration-300"
+      >
+        <Plus size={18} />
+        Add Student
+      </button>
+    </div>
 
-      {/* TABLE */}
-      <div className="bg-white rounded-xl shadow overflow-x-auto">
-        <table className="w-full min-w-[900px]">
+    {/* SEARCH */}
+    <div className="mb-6 w-96 relative">
+      <Search className="absolute left-4 top-3 text-[#2563EB]" />
 
-          <thead className="bg-blue-600 text-white">
-            <tr>
-              <th className="p-3">ID</th>
-              <th>Name</th>
-              <th>Gender</th>
-              <th>Age</th>
-              <th>Address</th>
-              <th>phone</th>
-              <th>parent-no</th>
-              <th>Department</th>
-              <th>Course</th>
-              <th>Action</th>
-            </tr>
-          </thead>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search student..."
+        className="w-full pl-11 py-3 rounded-xl border border-blue-200 bg-white focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none shadow-sm"
+      />
+    </div>
 
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="7" className="text-center p-5">
-                  Loading...
-                </td>
-              </tr>
-            ) : filtered.length > 0 ? (
-              filtered.map((s) => (
-                <tr key={s.id || s.Id} className="border-b hover:bg-gray-50">
+    {/* TABLE */}
+    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <table className="w-full min-w-[900px]">
 
-                  <td className="p-3">{s.id || s.Id}</td>
+        <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
+          <tr>
+            <th className="p-4">ID</th>
+            <th className="p-4">Name</th>
+            <th className="p-4">Address</th>
+            <th className="p-4">Age</th>
+            <th className="p-4">Phone</th>
+            <th className="p-4">Parent Phone</th>
+            <th className="p-4">Gender</th>
+            <th className="p-4">Department</th>
+            <th className="p-4">Course</th>
+            <th className="p-4">Actions</th>
+          </tr>
+        </thead>
 
-                  <td>
-                    {s.firstName || s.FirstName} {s.lastName || s.LastName}
+        <tbody>
+  {loading ? (
+    <tr>
+      <td colSpan="10" className="text-center p-6 text-gray-500">
+        Loading...
+      </td>
+    </tr>
+  ) : currentStudents.length > 0 ? (
+    currentStudents.map((s) => {
+      const dept = departments.find(
+        (d) => (d.id ?? d.Id) === (s.departmentId ?? s.DepartmentId)
+      );
+
+      const course = courses.find(
+        (c) => (c.id ?? c.Id) === (s.courseId ?? s.CourseId)
+      );
+
+              return (
+                <tr
+                  key={s.id ?? s.Id}
+                  className="border-b hover:bg-blue-50 transition-all duration-300"
+                >
+                  <td className="p-4 text-gray-700">{s.id ?? s.Id}</td>
+
+                  <td className="p-4 text-gray-700">
+                    {s.firstName ?? s.FirstName} {s.lastName ?? s.LastName}
                   </td>
 
-                  <td>{s.gender || s.Gender}</td>
-                 
-
-                  <td>{s.age || s.Age}</td>
-                   <td>{s.Address || s.address}</td>
-
-                  <td>{s.phone || s.Phone}</td>
-                  <td>{s.ParentPhone || s.parentPhone}</td>
-
-
-                  <td>
-                    {departments.find(d => d.id === (s.departmentId || s.DepartmentId))?.name ||
-                      departments.find(d => d.Id === (s.DepartmentId || s.departmentId))?.Name ||
-                      "N/A"}
+                  <td className="p-4 text-gray-700">
+                    {s.address ?? s.Address}
                   </td>
 
-                  <td>
-                    {courses.find(c => c.id === (s.courseId || s.CourseId))?.courseName ||
-                      courses.find(c => c.Id === (s.CourseId || s.courseId))?.CourseName ||
-                      "N/A"}
+                  <td className="p-4 text-gray-700">
+                    {s.age ?? s.Age}
                   </td>
 
-                  <td className="p-3 flex gap-2">
+                  <td className="p-4 text-gray-700">
+                    {s.phone ?? s.Phone}
+                  </td>
+
+                  <td className="p-4 text-gray-700">
+                    {s.parentPhone ?? s.ParentPhone}
+                  </td>
+
+                  <td className="p-4 text-gray-700">
+                    {s.gender ?? s.Gender}
+                  </td>
+
+                  <td className="p-4 text-gray-700">
+                    {dept?.name ?? dept?.Name}
+                  </td>
+
+                  <td className="p-4 text-gray-700">
+                    {course?.courseName ?? course?.CourseName}
+                  </td>
+
+                  <td className="p-4 flex gap-2">
+
                     <button
                       onClick={() => openEdit(s)}
-                      className="text-blue-600 p-2 hover:bg-blue-100 rounded"
+                      className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition-all"
                     >
                       <Pencil size={18} />
                     </button>
 
                     <button
-                      onClick={() => handleDelete(s.id || s.Id)}
-                      className="text-red-600 p-2 hover:bg-red-100 rounded"
+                      onClick={() => handleDelete(s.id ?? s.Id)}
+                      className="w-10 h-10 rounded-lg bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
                     >
                       <Trash2 size={18} />
                     </button>
+
                   </td>
-
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center p-5">
-                  No Students Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-
-        </table>
-      </div>
-
-      {/* MODAL */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-
-            <motion.div className="bg-white p-5 rounded w-[500px]">
-
-              <h2 className="text-xl font-bold mb-3">
-                {isEdit ? "Update Student" : "Create Student"}
-              </h2>
-
-              <div className="grid grid-cols-2 gap-2">
-
-                <input className="border p-2 rounded" placeholder="First Name"
-                  value={form.firstName}
-                  onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-                />
-
-                <input className="border p-2 rounded" placeholder="Last Name"
-                  value={form.lastName}
-                  onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-                />
-
-                <div className="col-span-2">
-                  <label className="block mb-2 font-medium">Gender</label>
-
-                  <div className="flex gap-6">
-
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Male"
-                        checked={form.gender === "Male"}
-                        onChange={(e) =>
-                          setForm({ ...form, gender: e.target.value })
-                        }
-                      />
-                      Male
-                    </label>
-
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="gender"
-                        value="Female"
-                        checked={form.gender === "Female"}
-                        onChange={(e) =>
-                          setForm({ ...form, gender: e.target.value })
-                        }
-                      />
-                      Female
-                    </label>
-
-                  </div>
-                </div>
-
-                <input className="border p-2 rounded" placeholder="Age"
-                  type="number"
-                  value={form.age}
-                  onChange={(e) => setForm({ ...form, age: e.target.value })}
-                />
-
-                <input className="border p-2 rounded" placeholder="Address"
-                  value={form.address}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
-                />
-                <input className="border p-2 rounded" placeholder="Phone"
-                  value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                />
-
-                {/* ✅ PARENT PHONE */}
-                <input className="border p-2 rounded" placeholder="Parent Phone"
-                  value={form.parentPhone}
-                  onChange={(e) =>
-                    setForm({ ...form, parentPhone: e.target.value })
-                  }
-                />
-
-                <select
-                  className="border p-2 rounded col-span-2"
-                  value={form.departmentId}
-                  onChange={(e) =>
-                    setForm({ ...form, departmentId: e.target.value })
-                  }
-                >
-                  <option value="">Select Department</option>
-                  {departments.map((d) => (
-                    <option key={d.id || d.Id} value={d.id || d.Id}>
-                      {d.name || d.Name}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  className="border p-2 rounded col-span-2"
-                  value={form.courseId}
-                  onChange={(e) =>
-                    setForm({ ...form, courseId: e.target.value })
-                  }
-                >
-                  <option value="">Select Course</option>
-                  {courses.map((c) => (
-                    <option key={c.CourseId || c.courseId} value={c.CourseId || c.courseId}>
-                      {c.CourseName || c.courseName}
-                    </option>
-                  ))}
-                </select>
-
-              </div>
-
-              <div className="flex justify-end gap-2 mt-3">
-                <button onClick={() => setShowModal(false)}>
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleSubmit}
-                  className="bg-blue-600 text-white px-4 py-2 rounded"
-                >
-                  {saving ? "Saving..." : "Save"}
-                </button>
-              </div>
-
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan="10" className="text-center p-6 text-gray-500">
+                No Students Found
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
-  );
+
+    {/* MODAL */}
+    <AnimatePresence>
+      {showModal && (
+        <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+
+          <motion.div className="bg-white rounded-3xl shadow-[0_30px_80px_rgba(37,99,235,.25)] p-8 w-[500px]">
+
+            <h2 className="text-2xl font-bold text-[#1E3A8A] mb-6">
+              {isEdit ? "Update Student" : "Add Student"}
+            </h2>
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="Age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+            />
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+
+            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              placeholder="Parent Phone"
+              value={parentPhone}
+              onChange={(e) => setParentPhone(e.target.value)}
+            />
+
+            {/* GENDER */}
+            <div className="mt-4 text-gray-700">
+              <label className="mr-4">
+                <input
+                  type="radio"
+                  value="Male"
+                  checked={gender === "Male"}
+                  onChange={(e) => setGender(e.target.value)}
+                /> Male
+              </label>
+
+              <label>
+                <input
+                  type="radio"
+                  value="Female"
+                  checked={gender === "Female"}
+                  onChange={(e) => setGender(e.target.value)}
+                /> Female
+              </label>
+            </div>
+
+            {/* DEPARTMENT */}
+            <select
+              className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              value={departmentId}
+              onChange={(e) => setDepartmentId(e.target.value)}
+            >
+              <option>Select Department</option>
+              {departments.map((d) => (
+                <option key={d.id ?? d.Id} value={d.id ?? d.Id}>
+                  {d.name ?? d.Name}
+                </option>
+              ))}
+            </select>
+
+            {/* COURSE */}
+            <select
+              className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              value={courseId}
+              onChange={(e) => setCourseId(e.target.value)}
+            >
+              <option>Select Course</option>
+              {courses.map((c) => (
+                <option key={c.id ?? c.Id} value={c.id ?? c.Id}>
+                  {c.courseName ?? c.CourseName}
+                </option>
+              ))}
+            </select>
+
+            {/* BUTTONS */}
+            <div className="flex justify-end gap-3 mt-6">
+
+              <button
+                onClick={() => setShowModal(false)}
+                className="px-5 py-3 rounded-xl border border-blue-200 text-[#1E3A8A] hover:bg-blue-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleSubmit}
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all"
+              >
+                {saving ? "Saving..." : isEdit ? "Update" : "Save"}
+              </button>
+
+            </div>
+
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+
+    {/* PAGINATION */}
+<div className="flex justify-center items-center gap-3 mt-6">
+
+  {/* PREVIOUS */}
+  <button
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+    className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40 hover:bg-blue-50"
+  >
+    Previous
+  </button>
+
+  {/* PAGE NUMBERS */}
+  {[...Array(totalPages)].map((_, i) => (
+    <button
+      key={i}
+      onClick={() => setCurrentPage(i + 1)}
+      className={`px-4 py-2 rounded-lg ${
+        currentPage === i + 1
+          ? "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
+          : "border border-blue-200 text-[#1E3A8A]"
+      }`}
+    >
+      {i + 1}
+    </button>
+  ))}
+
+  {/* NEXT */}
+  <button
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+    className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40 hover:bg-blue-50"
+  >
+    Next
+  </button>
+
+</div>
+
+  </div>
+);
 }
