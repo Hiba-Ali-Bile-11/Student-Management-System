@@ -5,11 +5,11 @@ export default function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Remove token / user data
+    
     localStorage.removeItem("token");
     localStorage.removeItem("user");
 
-    // 2. Redirect to login page
+  
     navigate("/login");
   }, [navigate]);
 

@@ -128,208 +128,467 @@ export default function Course() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50 p-8">
+  <div className="min-h-screen bg-blue-50 dark:bg-gray-900 p-8 text-black dark:text-white">
 
-      {/* HEADER (SAME AS STUDENT) */}
-      <div className="flex justify-between items-center mb-8">
+    {/* HEADER */}
+    <div className="flex justify-between items-center mb-8">
 
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
-            <BookOpen className="text-white" size={28} />
-          </div>
+      <div className="flex items-center gap-4">
 
-          <div>
-            <h1 className="text-3xl font-bold text-[#1E3A8A]">
-              Courses
-            </h1>
-            <p className="text-[#2563EB]">
-              Total: {filteredCourses.length}
-            </p>
-          </div>
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
+          <BookOpen className="text-white" size={28} />
         </div>
 
-        <button
-          onClick={openCreate}
-          className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all"
-        >
-          <Plus size={18} /> Add Course
-        </button>
-      </div>
+        <div>
+          <h1 className="text-3xl font-bold text-[#1E3A8A] dark:text-white">
+            Courses
+          </h1>
 
-      {/* SEARCH (SAME STYLE) */}
-      <div className="mb-6 w-96 relative">
-        <Search className="absolute left-4 top-3 text-[#2563EB]" />
-
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search course..."
-          className="w-full pl-11 py-3 rounded-xl border border-blue-200 bg-white focus:ring-4 focus:ring-cyan-300 outline-none shadow-sm"
-        />
-      </div>
-
-      {/* TABLE (SAME STYLE FEEL) */}
-      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <table className="w-full min-w-[900px]">
-
-          <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
-            <tr>
-              <th className="p-4">ID</th>
-              <th className="p-4">Course</th>
-              <th className="p-4">Credit Hours</th>
-              <th className="p-4">Department</th>
-              <th className="p-4">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="5" className="text-center p-6 text-gray-500">
-                  Loading...
-                </td>
-              </tr>
-            ) : currentCourses.length > 0 ? (
-              currentCourses.map((c) => {
-                const dept = departments.find(
-                  (d) => (d.id ?? d.Id) === (c.departmentId ?? c.DepartmentId)
-                );
-
-                return (
-                  <tr key={c.id ?? c.Id} className="border-b hover:bg-blue-50">
-
-                    <td className="p-4">{c.id ?? c.Id}</td>
-                    <td className="p-4">{c.courseName ?? c.CourseName}</td>
-                    <td className="p-4">{c.creditHours ?? c.CreditHours}</td>
-                    <td className="p-4">{dept?.name ?? dept?.Name}</td>
-
-                    <td className="p-4 flex gap-2">
-
-                      <button
-                        onClick={() => openEdit(c)}
-                        className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center"
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(c.id ?? c.Id)}
-                        className="w-10 h-10 rounded-lg bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="5" className="text-center p-6 text-gray-500">
-                  No Courses Found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* PAGINATION (SAME STYLE AS STUDENT) */}
-      <div className="flex justify-center items-center gap-3 mt-6">
-
-        <button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((p) => p - 1)}
-          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
-        >
-          Previous
-        </button>
-
-        {[...Array(totalPages)].map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`px-4 py-2 rounded-lg ${
-              currentPage === i + 1
-                ? "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
-                : "border border-blue-200 text-[#1E3A8A]"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-
-        <button
-          disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((p) => p + 1)}
-          className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40"
-        >
-          Next
-        </button>
+          <p className="text-[#2563EB] dark:text-cyan-300">
+            Total: {filteredCourses.length}
+          </p>
+        </div>
 
       </div>
 
-      {/* MODAL (SAME STYLE SYSTEM) */}
-      <AnimatePresence>
-        {showModal && (
-          <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center">
 
-            <motion.div className="bg-white rounded-3xl p-8 w-[500px]">
-
-              <h2 className="text-2xl font-bold text-[#1E3A8A] mb-6">
-                {isEdit ? "Update Course" : "Add Course"}
-              </h2>
-
-              <input
-                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
-                placeholder="Course Name"
-                value={courseName}
-                onChange={(e) => setCourseName(e.target.value)}
-              />
-
-              <input
-                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
-                placeholder="Credit Hours"
-                value={creditHours}
-                onChange={(e) => setCreditHours(e.target.value)}
-              />
-
-              <select
-                className="w-full mt-3 p-3 rounded-xl border border-blue-200"
-                value={departmentId}
-                onChange={(e) => setDepartmentId(e.target.value)}
-              >
-                <option>Select Department</option>
-                {departments.map((d) => (
-                  <option key={d.id ?? d.Id} value={d.id ?? d.Id}>
-                    {d.name ?? d.Name}
-                  </option>
-                ))}
-              </select>
-
-              <div className="flex justify-end gap-3 mt-6">
-
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-5 py-3 rounded-xl border"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleSubmit}
-                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
-                >
-                  {saving ? "Saving..." : isEdit ? "Update" : "Save"}
-                </button>
-
-              </div>
-
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <button
+        onClick={openCreate}
+        className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all flex items-center gap-2"
+      >
+        <Plus size={18} /> Add Course
+      </button>
 
     </div>
-  );
+
+
+
+    {/* SEARCH */}
+    <div className="mb-6 w-96 relative">
+
+      <Search 
+        className="absolute left-4 top-3 text-[#2563EB]" 
+      />
+
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search course..."
+        className="
+          w-full pl-11 py-3 rounded-xl 
+          border border-blue-200 
+          bg-white 
+          dark:bg-gray-800 
+          dark:border-gray-700 
+          text-gray-900 
+          dark:text-white
+          placeholder-gray-400
+          focus:ring-4 focus:ring-cyan-300 
+          outline-none shadow-sm
+        "
+      />
+
+    </div>
+
+
+
+    {/* TABLE */}
+    <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+
+      <table className="w-full min-w-[900px] text-gray-900 dark:text-white">
+
+        <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
+
+          <tr>
+
+            <th className="p-4">ID</th>
+
+            <th className="p-4">Course</th>
+
+            <th className="p-4">Credit Hours</th>
+
+            <th className="p-4">Department</th>
+
+            <th className="p-4">Actions</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          {loading ? (
+
+            <tr>
+
+              <td 
+                colSpan="5" 
+                className="text-center p-6 text-gray-500 dark:text-gray-300"
+              >
+                Loading...
+              </td>
+
+            </tr>
+
+
+          ) : currentCourses.length > 0 ? (
+
+            currentCourses.map((c)=>{
+
+              const dept = departments.find(
+                (d)=> 
+                (d.id ?? d.Id) === 
+                (c.departmentId ?? c.DepartmentId)
+              );
+
+
+              return (
+
+                <tr
+                  key={c.id ?? c.Id}
+                  className="
+                    border-b 
+                    border-gray-200 
+                    dark:border-gray-700
+                    hover:bg-blue-50
+                    dark:hover:bg-gray-700
+                    transition
+                  "
+                >
+
+                  <td className="p-4">
+                    {c.id ?? c.Id}
+                  </td>
+
+
+                  <td className="p-4">
+                    {c.courseName ?? c.CourseName}
+                  </td>
+
+
+                  <td className="p-4">
+                    {c.creditHours ?? c.CreditHours}
+                  </td>
+
+
+                  <td className="p-4">
+                    {dept?.name ?? dept?.Name}
+                  </td>
+
+
+                  <td className="p-4 flex gap-2">
+
+
+                    <button
+                      onClick={()=>openEdit(c)}
+                      className="
+                        w-10 h-10 rounded-lg
+                        bg-blue-100
+                        text-[#2563EB]
+                        hover:bg-[#2563EB]
+                        hover:text-white
+                        flex items-center justify-center
+                      "
+                    >
+                      <Pencil size={18}/>
+                    </button>
+
+
+                    <button
+                      onClick={()=>handleDelete(c.id ?? c.Id)}
+                      className="
+                        w-10 h-10 rounded-lg
+                        bg-red-100
+                        text-red-500
+                        hover:bg-red-500
+                        hover:text-white
+                        flex items-center justify-center
+                      "
+                    >
+                      <Trash2 size={18}/>
+                    </button>
+
+
+                  </td>
+
+                </tr>
+
+              )
+
+            })
+
+
+          ) : (
+
+            <tr>
+
+              <td
+                colSpan="5"
+                className="text-center p-6 text-gray-500 dark:text-gray-300"
+              >
+                No Courses Found
+              </td>
+
+            </tr>
+
+          )}
+
+        </tbody>
+
+      </table>
+
+    </div>
+        {/* PAGINATION */}
+    <div className="flex justify-center items-center gap-3 mt-6">
+
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p)=>p-1)}
+        className="
+          px-4 py-2 rounded-lg 
+          border border-blue-200
+          dark:border-gray-600
+          text-[#1E3A8A]
+          dark:text-white
+          disabled:opacity-40
+        "
+      >
+        Previous
+      </button>
+
+
+      {[...Array(totalPages)].map((_,i)=>(
+
+        <button
+          key={i}
+          onClick={()=>setCurrentPage(i+1)}
+          className={`
+            px-4 py-2 rounded-lg
+            ${
+              currentPage === i+1
+              ?
+              "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
+              :
+              "border border-blue-200 dark:border-gray-600 text-[#1E3A8A] dark:text-white"
+            }
+          `}
+        >
+          {i+1}
+        </button>
+
+      ))}
+
+
+      <button
+        disabled={currentPage === totalPages}
+        onClick={()=>setCurrentPage((p)=>p+1)}
+        className="
+          px-4 py-2 rounded-lg 
+          border border-blue-200
+          dark:border-gray-600
+          text-[#1E3A8A]
+          dark:text-white
+          disabled:opacity-40
+        "
+      >
+        Next
+      </button>
+
+
+    </div>
+
+
+
+    {/* MODAL */}
+    <AnimatePresence>
+
+      {showModal && (
+
+        <motion.div
+          className="
+            fixed inset-0 
+            bg-black/50 
+            flex items-center justify-center
+            z-50
+          "
+        >
+
+
+          <motion.div
+            className="
+              bg-white 
+              dark:bg-gray-800
+              rounded-3xl 
+              p-8 
+              w-[500px]
+              text-gray-900
+              dark:text-white
+            "
+          >
+
+
+            <h2 className="
+              text-2xl 
+              font-bold 
+              text-[#1E3A8A]
+              dark:text-white
+              mb-6
+            ">
+              {isEdit ? "Update Course" : "Add Course"}
+            </h2>
+
+
+
+            <input
+
+              className="
+                w-full mt-3 p-3 
+                rounded-xl 
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
+
+              placeholder="Course Name"
+
+              value={courseName}
+
+              onChange={(e)=>setCourseName(e.target.value)}
+
+            />
+
+
+
+            <input
+
+              className="
+                w-full mt-3 p-3 
+                rounded-xl 
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
+
+              placeholder="Credit Hours"
+
+              value={creditHours}
+
+              onChange={(e)=>setCreditHours(e.target.value)}
+
+            />
+
+
+
+            <select
+
+              className="
+                w-full mt-3 p-3 
+                rounded-xl 
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
+
+              value={departmentId}
+
+              onChange={(e)=>setDepartmentId(e.target.value)}
+
+            >
+
+              <option>
+                Select Department
+              </option>
+
+
+              {departments.map((d)=>(
+
+                <option
+                  key={d.id ?? d.Id}
+                  value={d.id ?? d.Id}
+                >
+                  {d.name ?? d.Name}
+                </option>
+
+              ))}
+
+
+            </select>
+
+
+
+            <div className="flex justify-end gap-3 mt-6">
+
+
+              <button
+
+                onClick={()=>setShowModal(false)}
+
+                className="
+                  px-5 py-3 
+                  rounded-xl
+                  border
+                  border-gray-300
+                  dark:border-gray-600
+                  dark:text-white
+                  hover:bg-gray-100
+                  dark:hover:bg-gray-700
+                "
+
+              >
+                Cancel
+
+              </button>
+
+
+
+              <button
+
+                onClick={handleSubmit}
+
+                className="
+                  px-5 py-3 
+                  rounded-xl
+                  bg-gradient-to-r 
+                  from-[#1E3A8A] 
+                  via-[#2563EB] 
+                  to-[#3B82F6]
+                  text-white
+                "
+
+              >
+
+                {saving ? "Saving..." : isEdit ? "Update" : "Save"}
+
+              </button>
+
+
+            </div>
+
+
+          </motion.div>
+
+
+        </motion.div>
+
+      )}
+
+    </AnimatePresence>
+
+
+  </div>
+
+);
 }

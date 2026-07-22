@@ -15,11 +15,27 @@ async function handleResponse(response) {
     return data;
 }
 
+
 // =========================
 // GET ALL USERS
 // =========================
 export async function getAllUsers() {
   const res = await fetch(`${API_URL}/api/Users`);
+  return handleResponse(res);
+}
+
+
+// REGISTER USER
+// =========================
+export async function registerUser(user) {
+  const res = await fetch(`${API_URL}/api/Users/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(user),
+  });
+
   return handleResponse(res);
 }
 
@@ -138,6 +154,10 @@ export async function forgetPassword(email, newPassword) {
       newPassword,
     }),
   });
+
+  
+
+
 
   return handleResponse(res);
 }

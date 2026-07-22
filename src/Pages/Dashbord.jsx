@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 
 
-function Dashboard() {
+function Dashbord() {
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -16,4 +16,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default Dashbord;

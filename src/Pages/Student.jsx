@@ -210,53 +210,156 @@ useEffect(() => {
   };
 
  return (
-  <div className="min-h-screen bg-blue-50 p-8">
+  <div className="
+    min-h-screen 
+    bg-blue-50 
+    dark:bg-gray-900
+    p-8
+    text-black
+    dark:text-white
+  ">
 
     {/* HEADER */}
     <div className="flex justify-between items-center mb-8">
 
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] flex items-center justify-center shadow-lg">
-          <User className="text-white" size={28} />
+
+        <div className="
+          w-14 h-14 
+          rounded-2xl 
+          bg-gradient-to-br 
+          from-[#1E3A8A] 
+          via-[#2563EB] 
+          to-[#3B82F6]
+          flex items-center justify-center 
+          shadow-lg
+        ">
+          <User className="text-white" size={28}/>
         </div>
 
+
         <div>
-          <h1 className="text-3xl font-bold text-[#1E3A8A]">
+
+          <h1 className="
+            text-3xl 
+            font-bold 
+            text-[#1E3A8A]
+            dark:text-white
+          ">
             Students
           </h1>
-          <p className="text-[#2563EB]">
+
+
+          <p className="
+            text-[#2563EB]
+            dark:text-cyan-300
+          ">
             Total: {filteredStudents.length}
           </p>
+
         </div>
+
       </div>
+
+
 
       <button
         onClick={openCreate}
-        className="px-6 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white flex items-center gap-2 shadow-lg hover:scale-105 transition-all duration-300"
+        className="
+          px-6 py-3
+          rounded-xl
+          bg-gradient-to-r
+          from-[#1E3A8A]
+          via-[#2563EB]
+          to-[#3B82F6]
+          text-white
+          flex items-center gap-2
+          shadow-lg
+          hover:scale-105
+          transition-all
+        "
       >
-        <Plus size={18} />
+
+        <Plus size={18}/>
         Add Student
+
       </button>
+
+
     </div>
+
+
 
     {/* SEARCH */}
     <div className="mb-6 w-96 relative">
-      <Search className="absolute left-4 top-3 text-[#2563EB]" />
+
+      <Search 
+        className="absolute left-4 top-3 text-[#2563EB]"
+      />
+
 
       <input
+
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+
+        onChange={(e)=>setSearch(e.target.value)}
+
         placeholder="Search student..."
-        className="w-full pl-11 py-3 rounded-xl border border-blue-200 bg-white focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none shadow-sm"
+
+        className="
+          w-full
+          pl-11
+          py-3
+          rounded-xl
+          border
+          border-blue-200
+          dark:border-gray-700
+          bg-white
+          dark:bg-gray-800
+          text-gray-900
+          dark:text-white
+          placeholder-gray-400
+          focus:ring-4
+          focus:ring-cyan-300
+          outline-none
+          shadow-sm
+        "
+
       />
+
     </div>
 
-    {/* TABLE */}
-    <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-      <table className="w-full min-w-[900px]">
 
-        <thead className="bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white">
+
+
+    {/* TABLE */}
+    <div className="
+      bg-white
+      dark:bg-gray-800
+      rounded-3xl
+      shadow-2xl
+      overflow-hidden
+    ">
+
+
+      <table className="
+        w-full
+        min-w-[900px]
+        text-gray-900
+        dark:text-white
+      ">
+
+
+        <thead className="
+          bg-gradient-to-r
+          from-[#1E3A8A]
+          via-[#2563EB]
+          to-[#3B82F6]
+          text-white
+        ">
+
           <tr>
+
             <th className="p-4">ID</th>
             <th className="p-4">Name</th>
             <th className="p-4">Address</th>
@@ -267,254 +370,607 @@ useEffect(() => {
             <th className="p-4">Department</th>
             <th className="p-4">Course</th>
             <th className="p-4">Actions</th>
+
           </tr>
+
         </thead>
 
+
+
         <tbody>
-  {loading ? (
-    <tr>
-      <td colSpan="10" className="text-center p-6 text-gray-500">
-        Loading...
-      </td>
-    </tr>
-  ) : currentStudents.length > 0 ? (
-    currentStudents.map((s) => {
-      const dept = departments.find(
-        (d) => (d.id ?? d.Id) === (s.departmentId ?? s.DepartmentId)
-      );
 
-      const course = courses.find(
-        (c) => (c.id ?? c.Id) === (s.courseId ?? s.CourseId)
-      );
 
-              return (
-                <tr
-                  key={s.id ?? s.Id}
-                  className="border-b hover:bg-blue-50 transition-all duration-300"
-                >
-                  <td className="p-4 text-gray-700">{s.id ?? s.Id}</td>
+        {loading ? (
 
-                  <td className="p-4 text-gray-700">
-                    {s.firstName ?? s.FirstName} {s.lastName ?? s.LastName}
-                  </td>
+          <tr>
 
-                  <td className="p-4 text-gray-700">
-                    {s.address ?? s.Address}
-                  </td>
+            <td
+              colSpan="10"
+              className="
+                text-center
+                p-6
+                text-gray-500
+                dark:text-gray-300
+              "
+            >
+              Loading...
+            </td>
 
-                  <td className="p-4 text-gray-700">
-                    {s.age ?? s.Age}
-                  </td>
+          </tr>
 
-                  <td className="p-4 text-gray-700">
-                    {s.phone ?? s.Phone}
-                  </td>
 
-                  <td className="p-4 text-gray-700">
-                    {s.parentPhone ?? s.ParentPhone}
-                  </td>
+        ) : currentStudents.length > 0 ? (
 
-                  <td className="p-4 text-gray-700">
-                    {s.gender ?? s.Gender}
-                  </td>
+          currentStudents.map((s)=>{
 
-                  <td className="p-4 text-gray-700">
-                    {dept?.name ?? dept?.Name}
-                  </td>
+            const dept = departments.find(
+              (d)=>
+              (d.id ?? d.Id) ===
+              (s.departmentId ?? s.DepartmentId)
+            );
 
-                  <td className="p-4 text-gray-700">
-                    {course?.courseName ?? course?.CourseName}
-                  </td>
 
-                  <td className="p-4 flex gap-2">
+            const course = courses.find(
+              (c)=>
+              (c.id ?? c.Id) ===
+              (s.courseId ?? s.CourseId)
+            );
 
-                    <button
-                      onClick={() => openEdit(s)}
-                      className="w-10 h-10 rounded-lg bg-blue-100 text-[#2563EB] hover:bg-[#2563EB] hover:text-white flex items-center justify-center transition-all"
-                    >
-                      <Pencil size={18} />
-                    </button>
 
-                    <button
-                      onClick={() => handleDelete(s.id ?? s.Id)}
-                      className="w-10 h-10 rounded-lg bg-red-100 text-red-500 hover:bg-red-500 hover:text-white flex items-center justify-center transition-all"
-                    >
-                      <Trash2 size={18} />
-                    </button>
 
-                  </td>
-                </tr>
-              );
-            })
-          ) : (
-            <tr>
-              <td colSpan="10" className="text-center p-6 text-gray-500">
-                No Students Found
-              </td>
-            </tr>
-          )}
+            return (
+
+              <tr
+
+                key={s.id ?? s.Id}
+
+                className="
+                  border-b
+                  border-gray-200
+                  dark:border-gray-700
+                  hover:bg-blue-50
+                  dark:hover:bg-gray-700
+                  transition-all
+                "
+
+              >
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.id ?? s.Id}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.firstName ?? s.FirstName}
+                  {" "}
+                  {s.lastName ?? s.LastName}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.address ?? s.Address}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.age ?? s.Age}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.phone ?? s.Phone}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.parentPhone ?? s.ParentPhone}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {s.gender ?? s.Gender}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {dept?.name ?? dept?.Name}
+                </td>
+
+
+                <td className="p-4 text-gray-700 dark:text-gray-200">
+                  {course?.courseName ?? course?.CourseName}
+                </td>
+                                <td className="p-4 flex gap-2">
+
+                  <button
+                    onClick={() => openEdit(s)}
+                    className="
+                      w-10 h-10
+                      rounded-lg
+                      bg-blue-100
+                      text-[#2563EB]
+                      hover:bg-[#2563EB]
+                      hover:text-white
+                      flex items-center justify-center
+                      transition-all
+                    "
+                  >
+                    <Pencil size={18}/>
+                  </button>
+
+
+                  <button
+                    onClick={() => handleDelete(s.id ?? s.Id)}
+                    className="
+                      w-10 h-10
+                      rounded-lg
+                      bg-red-100
+                      text-red-500
+                      hover:bg-red-500
+                      hover:text-white
+                      flex items-center justify-center
+                      transition-all
+                    "
+                  >
+                    <Trash2 size={18}/>
+                  </button>
+
+                </td>
+
+
+              </tr>
+
+            );
+
+          })
+
+        ) : (
+
+          <tr>
+
+            <td
+              colSpan="10"
+              className="
+                text-center 
+                p-6
+                text-gray-500
+                dark:text-gray-300
+              "
+            >
+              No Students Found
+            </td>
+
+          </tr>
+
+        )}
+
         </tbody>
+
       </table>
+
     </div>
+
+
+
 
     {/* MODAL */}
     <AnimatePresence>
+
       {showModal && (
-        <motion.div className="fixed inset-0 bg-black/50 flex items-center justify-center">
 
-          <motion.div className="bg-white rounded-3xl shadow-[0_30px_80px_rgba(37,99,235,.25)] p-8 w-[500px]">
+        <motion.div
+          className="
+            fixed inset-0
+            bg-black/50
+            flex items-center justify-center
+            z-50
+          "
+        >
 
-            <h2 className="text-2xl font-bold text-[#1E3A8A] mb-6">
+
+          <motion.div
+            className="
+              bg-white
+              dark:bg-gray-800
+              rounded-3xl
+              shadow-xl
+              p-8
+              w-[500px]
+              text-gray-900
+              dark:text-white
+            "
+          >
+
+
+            <h2
+              className="
+                text-2xl
+                font-bold
+                text-[#1E3A8A]
+                dark:text-white
+                mb-6
+              "
+            >
               {isEdit ? "Update Student" : "Add Student"}
             </h2>
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="First Name"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(e)=>setFirstName(e.target.value)}
             />
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="Last Name"
               value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              onChange={(e)=>setLastName(e.target.value)}
             />
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="Address"
               value={address}
-              onChange={(e) => setAddress(e.target.value)}
+              onChange={(e)=>setAddress(e.target.value)}
             />
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="Age"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e)=>setAge(e.target.value)}
             />
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="Phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e)=>setPhone(e.target.value)}
             />
 
-            <input className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+
+
+            <input
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+                outline-none
+              "
               placeholder="Parent Phone"
               value={parentPhone}
-              onChange={(e) => setParentPhone(e.target.value)}
+              onChange={(e)=>setParentPhone(e.target.value)}
             />
 
+
+
+
             {/* GENDER */}
-            <div className="mt-4 text-gray-700">
+
+            <div className="mt-4 text-gray-700 dark:text-gray-200">
+
               <label className="mr-4">
+
                 <input
                   type="radio"
                   value="Male"
-                  checked={gender === "Male"}
-                  onChange={(e) => setGender(e.target.value)}
-                /> Male
+                  checked={gender==="Male"}
+                  onChange={(e)=>setGender(e.target.value)}
+                />
+
+                {" "}Male
+
               </label>
 
+
+
               <label>
+
                 <input
                   type="radio"
                   value="Female"
-                  checked={gender === "Female"}
-                  onChange={(e) => setGender(e.target.value)}
-                /> Female
+                  checked={gender==="Female"}
+                  onChange={(e)=>setGender(e.target.value)}
+                />
+
+                {" "}Female
+
               </label>
+
             </div>
 
+
+
+
+
             {/* DEPARTMENT */}
+
             <select
-              className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+              "
               value={departmentId}
-              onChange={(e) => setDepartmentId(e.target.value)}
+              onChange={(e)=>setDepartmentId(e.target.value)}
             >
+
               <option>Select Department</option>
-              {departments.map((d) => (
-                <option key={d.id ?? d.Id} value={d.id ?? d.Id}>
+
+
+              {departments.map((d)=>(
+
+                <option
+                  key={d.id ?? d.Id}
+                  value={d.id ?? d.Id}
+                >
                   {d.name ?? d.Name}
                 </option>
+
               ))}
+
             </select>
+
+
+
 
             {/* COURSE */}
+
             <select
-              className="w-full mt-3 p-3 rounded-xl border border-blue-200 focus:ring-4 focus:ring-cyan-300 focus:border-[#2563EB] outline-none"
+              className="
+                w-full mt-3 p-3
+                rounded-xl
+                border border-blue-200
+                dark:border-gray-600
+                bg-white
+                dark:bg-gray-700
+                text-gray-900
+                dark:text-white
+              "
               value={courseId}
-              onChange={(e) => setCourseId(e.target.value)}
+              onChange={(e)=>setCourseId(e.target.value)}
             >
+
               <option>Select Course</option>
-              {courses.map((c) => (
-                <option key={c.id ?? c.Id} value={c.id ?? c.Id}>
+
+
+              {courses.map((c)=>(
+
+                <option
+                  key={c.id ?? c.Id}
+                  value={c.id ?? c.Id}
+                >
                   {c.courseName ?? c.CourseName}
                 </option>
+
               ))}
+
+
             </select>
 
-            {/* BUTTONS */}
+                        {/* BUTTONS */}
             <div className="flex justify-end gap-3 mt-6">
 
               <button
                 onClick={() => setShowModal(false)}
-                className="px-5 py-3 rounded-xl border border-blue-200 text-[#1E3A8A] hover:bg-blue-50"
+                className="
+                  px-5 py-3
+                  rounded-xl
+                  border
+                  border-blue-200
+                  dark:border-gray-600
+                  text-[#1E3A8A]
+                  dark:text-white
+                  hover:bg-blue-50
+                  dark:hover:bg-gray-700
+                "
               >
                 Cancel
               </button>
 
+
               <button
                 onClick={handleSubmit}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white shadow-lg hover:scale-105 transition-all"
+                className="
+                  px-5 py-3
+                  rounded-xl
+                  bg-gradient-to-r
+                  from-[#1E3A8A]
+                  via-[#2563EB]
+                  to-[#3B82F6]
+                  text-white
+                  shadow-lg
+                  hover:scale-105
+                  transition-all
+                "
               >
                 {saving ? "Saving..." : isEdit ? "Update" : "Save"}
               </button>
 
+
             </div>
 
+
           </motion.div>
+
         </motion.div>
+
       )}
+
     </AnimatePresence>
 
+
+
+
+
     {/* PAGINATION */}
-<div className="flex justify-center items-center gap-3 mt-6">
+    <div className="flex justify-center items-center gap-3 mt-6">
 
-  {/* PREVIOUS */}
-  <button
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((p) => p - 1)}
-    className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40 hover:bg-blue-50"
-  >
-    Previous
-  </button>
 
-  {/* PAGE NUMBERS */}
-  {[...Array(totalPages)].map((_, i) => (
-    <button
-      key={i}
-      onClick={() => setCurrentPage(i + 1)}
-      className={`px-4 py-2 rounded-lg ${
-        currentPage === i + 1
-          ? "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
-          : "border border-blue-200 text-[#1E3A8A]"
-      }`}
-    >
-      {i + 1}
-    </button>
-  ))}
+      {/* PREVIOUS */}
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setCurrentPage((p)=>p-1)}
+        className="
+          px-4 py-2
+          rounded-lg
+          border
+          border-blue-200
+          dark:border-gray-600
+          text-[#1E3A8A]
+          dark:text-white
+          disabled:opacity-40
+          hover:bg-blue-50
+          dark:hover:bg-gray-700
+        "
+      >
+        Previous
+      </button>
 
-  {/* NEXT */}
-  <button
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((p) => p + 1)}
-    className="px-4 py-2 rounded-lg border border-blue-200 text-[#1E3A8A] disabled:opacity-40 hover:bg-blue-50"
-  >
-    Next
-  </button>
 
-</div>
+
+
+
+      {/* PAGE NUMBERS */}
+
+      {[...Array(totalPages)].map((_,i)=>(
+
+        <button
+          key={i}
+          onClick={()=>setCurrentPage(i+1)}
+          className={`
+
+            px-4 py-2
+            rounded-lg
+
+            ${
+              currentPage === i+1
+
+              ?
+
+              "bg-gradient-to-r from-[#1E3A8A] via-[#2563EB] to-[#3B82F6] text-white"
+
+              :
+
+              "border border-blue-200 dark:border-gray-600 text-[#1E3A8A] dark:text-white hover:bg-blue-50 dark:hover:bg-gray-700"
+
+            }
+
+          `}
+        >
+
+          {i+1}
+
+        </button>
+
+      ))}
+
+
+
+
+
+
+      {/* NEXT */}
+
+      <button
+        disabled={currentPage === totalPages}
+        onClick={() => setCurrentPage((p)=>p+1)}
+        className="
+          px-4 py-2
+          rounded-lg
+          border
+          border-blue-200
+          dark:border-gray-600
+          text-[#1E3A8A]
+          dark:text-white
+          disabled:opacity-40
+          hover:bg-blue-50
+          dark:hover:bg-gray-700
+        "
+      >
+        Next
+      </button>
+
+
+
+    </div>
+
+
 
   </div>
+
 );
 }
